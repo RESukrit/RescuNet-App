@@ -10,6 +10,7 @@ import {
   Send, 
   CheckCircle2, 
   ShieldAlert, 
+  ShieldCheck, 
   Flame, 
   Activity, 
   Navigation, 
@@ -20,7 +21,6 @@ import {
   Moon, 
   Sun, 
   ChevronRight,
-  Sparkles,
   WifiOff,
   Share2
 } from 'lucide-react';
@@ -621,20 +621,20 @@ export const VictimView: React.FC<VictimViewProps> = ({
           </div>
         </div>
 
-        {/* AI Hazard Verification Section (from RescuNet Prototype README) */}
+        {/* Automated Hazard Verification Section */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
-                <Sparkles className="w-4 h-4" />
+                <ShieldCheck className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">AI Hazard Verification</h3>
-                <p className="text-xs text-slate-400">Report blocked roads, debris, or rising water for AI verification and routing updates.</p>
+                <h3 className="text-base font-bold text-white">Automated Hazard Verification &amp; Safe Routing</h3>
+                <p className="text-xs text-slate-400">Report blocked roads, debris, or rising water for verification and dynamic routing updates.</p>
               </div>
             </div>
             <span className="text-[10px] uppercase font-bold bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 px-2 py-0.5 rounded">
-              Gemini AI
+              Telemetric Engine
             </span>
           </div>
 
@@ -665,12 +665,12 @@ export const VictimView: React.FC<VictimViewProps> = ({
                 {isVerifyingHazard ? (
                   <>
                     <Radio className="w-3.5 h-3.5 animate-spin" />
-                    <span>Analyzing Hazard...</span>
+                    <span>Analyzing Incident Telemetry...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Verify & Broadcast Hazard Alert</span>
+                    <Compass className="w-3.5 h-3.5" />
+                    <span>Verify &amp; Broadcast Hazard Alert</span>
                   </>
                 )}
               </button>

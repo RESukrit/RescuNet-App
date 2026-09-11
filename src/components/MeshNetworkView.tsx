@@ -4,7 +4,7 @@ import {
   Wifi, 
   WifiOff, 
   ShieldAlert, 
-  Sparkles, 
+  ShieldCheck, 
   Activity, 
   Zap, 
   CheckCircle2, 
@@ -316,17 +316,17 @@ export const MeshNetworkView: React.FC<MeshNetworkViewProps> = ({
             </div>
           </div>
 
-          {/* AI Hazard Verification Portal */}
+          {/* Automated Hazard Verification Portal */}
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-indigo-400" />
-                <span>AI Hazard Verification (Gemini)</span>
+                <ShieldCheck className="w-4 h-4 text-indigo-400" />
+                <span>Automated Hazard Verification &amp; Routing</span>
               </h3>
-              <span className="text-xs text-indigo-400 font-semibold">Verification Model</span>
+              <span className="text-xs text-indigo-400 font-semibold">Assessment Engine</span>
             </div>
             <p className="text-xs text-slate-400">
-              Civilians report blocked roads or structural hazards. AI evaluates risk level and suggests dynamic reroute bearings.
+              Civilians report blocked roads or structural hazards. Algorithmic telemetry evaluates risk level and suggests dynamic reroute bearings.
             </p>
 
             <form onSubmit={handleVerifyHazard} className="space-y-3 pt-2">
@@ -363,12 +363,12 @@ export const MeshNetworkView: React.FC<MeshNetworkViewProps> = ({
                 {isVerifying ? (
                   <>
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Analyzing Hazard via Gemini AI...</span>
+                    <span>Analyzing Hazard Telemetry...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Verify Hazard & Recalculate Evacuation Safe Route</span>
+                    <Compass className="w-3.5 h-3.5" />
+                    <span>Verify Hazard &amp; Recalculate Evacuation Safe Route</span>
                   </>
                 )}
               </button>

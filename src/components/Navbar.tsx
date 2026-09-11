@@ -6,11 +6,12 @@ import {
   RefreshCw, 
   Download, 
   Github, 
-  Sparkles, 
   ExternalLink,
   Wifi,
   FileText,
-  RotateCcw
+  RotateCcw,
+  Globe,
+  ShieldCheck
 } from 'lucide-react';
 import { AppConfig } from '../types';
 
@@ -22,6 +23,7 @@ interface NavbarProps {
   setActiveView: (view: ActiveViewType) => void;
   onOpenImporter: () => void;
   onResetToDefault: () => void;
+  onOpenHostingGuide?: () => void;
   isSyncing?: boolean;
 }
 
@@ -31,6 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveView,
   onOpenImporter,
   onResetToDefault,
+  onOpenHostingGuide,
   isSyncing = false,
 }) => {
   const handleExport = () => {
@@ -59,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
               <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-ping"></span>
-                GitHub Connected
+                Live Mesh Active
               </span>
             </div>
             <p className="text-xs text-slate-400 truncate max-w-xs sm:max-w-sm flex items-center gap-1">
@@ -77,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Center: View Switcher */}
+        {/* Center: View Switcher (Two Connected Websites + Dual Bridge) */}
         <nav className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
           <button
             id="view-victim-tab"
@@ -87,9 +90,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 ? 'bg-red-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
+            title="Website 1: Citizen SOS Distress Portal"
           >
             <Radio className="w-3.5 h-3.5" />
-            <span>Victim SOS</span>
+            <span>Citizen SOS</span>
           </button>
 
           <button
@@ -100,9 +104,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 ? 'bg-blue-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
+            title="Website 2: Emergency Operations Center (EOC) Command Dashboard"
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
-            <span>Command Map</span>
+            <span>EOC Command</span>
           </button>
 
           <button
@@ -113,9 +118,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 ? 'bg-indigo-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
+            title="Dual Live Bridge (Both Websites Connected)"
           >
             <Columns className="w-3.5 h-3.5" />
-            <span>Dual Sim</span>
+            <span>Dual Live Bridge</span>
           </button>
 
           <button
@@ -128,7 +134,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <Wifi className="w-3.5 h-3.5" />
-            <span>P2P Mesh</span>
+            <span>P2P Diagnostics</span>
           </button>
 
           <button
@@ -141,19 +147,30 @@ export const Navbar: React.FC<NavbarProps> = ({
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>Overview</span>
+            <span>Architecture</span>
           </button>
         </nav>
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {onOpenHostingGuide && (
+            <button
+              onClick={onOpenHostingGuide}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 transition-colors"
+              title="Cloudflare Pages & Free Web Hosting Guide"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Deploy Free</span>
+            </button>
+          )}
+
           <button
             id="connect-github-btn"
             onClick={onOpenImporter}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-600 hover:bg-blue-500 text-white shadow-md transition-colors"
           >
-            <Sparkles className="w-3.5 h-3.5 text-blue-200" />
-            <span className="hidden sm:inline">Sync / Read Repo</span>
+            <Github className="w-3.5 h-3.5 text-blue-200" />
+            <span className="hidden sm:inline">Sync Repo</span>
             <span className="sm:hidden">Sync</span>
           </button>
 

@@ -1,6 +1,10 @@
 {
   "name": "GitHub Page Dashboard",
-  "description": "RescuNet disaster management, offline peer-to-peer mesh SOS portal, and command triage dashboard.",
-  "requestFramePermissions": ["geolocation"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "description": "RescuNet dual-portal disaster management platform featuring real-time connected Civilian SOS Portal and Emergency Operations Center (EOC) Command Dashboard.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

@@ -12,7 +12,7 @@ import {
   Code2,
   Cpu,
   Layers,
-  Sparkles,
+  ShieldCheck,
   LayoutDashboard
 } from 'lucide-react';
 import { AppConfig, ProjectItem } from '../types';
@@ -349,7 +349,7 @@ export const WebsiteView: React.FC<WebsiteViewProps> = ({
           <div>
             <div className="font-bold text-slate-900 text-base">{profile.name}</div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Synthesized from GitHub Pages • Built with Google AI Studio
+              RescuNet Disaster Management Platform • Offline Emergency Protocol
             </p>
           </div>
 

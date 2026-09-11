@@ -371,7 +371,7 @@ export const GitHubImporterModal: React.FC<GitHubImporterModalProps> = ({
         {/* Modal Footer */}
         <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
           <div className="text-xs text-slate-500">
-            Powered by AI Studio & GitHub Page Synthesizer
+            RescuNet Emergency Systems Integration &amp; Repository Sync
           </div>
           <div className="flex items-center gap-2.5">
             <button

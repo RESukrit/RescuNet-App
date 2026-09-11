@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { defaultAppConfig } from './defaultData';
-import { AppConfig, SosSignal } from './types';
+import { AppConfig } from './types';
 import { Navbar, ActiveViewType } from './components/Navbar';
-import { VictimView } from './components/VictimView';
-import { DashboardView } from './components/DashboardView';
-import { SplitView } from './components/SplitView';
+import { CitizenPortal } from './components/CitizenPortal';
+import { AdminPortal } from './components/AdminPortal';
+import { DualSplitView } from './components/DualSplitView';
 import { MeshNetworkView } from './components/MeshNetworkView';
 import { WebsiteView } from './components/WebsiteView';
 import { GitHubImporterModal } from './components/GitHubImporterModal';
+import { HostingGuideModal } from './components/HostingGuideModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const STORAGE_KEY = 'rescunet_github_app_config_v2';
 
@@ -17,7 +19,6 @@ export default function App() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Ensure source is RESukrit/RescuNet if not set
         if (parsed && parsed.source && parsed.source.url.includes('seksisukrit')) {
           return defaultAppConfig;
         }
@@ -29,8 +30,20 @@ export default function App() {
     return defaultAppConfig;
   });
 
-  const [activeView, setActiveView] = useState<ActiveViewType>('dashboard');
+  // Check URL query parameters for direct standalone website access
+  const [activeView, setActiveView] = useState<ActiveViewType>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const portal = params.get('portal');
+      if (portal === 'citizen' || portal === 'user' || portal === 'victim') return 'victim';
+      if (portal === 'admin' || portal === 'eoc' || portal === 'command') return 'dashboard';
+      if (portal === 'split' || portal === 'dual') return 'split';
+    }
+    return 'dashboard';
+  });
+
   const [isImporterOpen, setIsImporterOpen] = useState<boolean>(false);
+  const [isHostingGuideOpen, setIsHostingGuideOpen] = useState<boolean>(false);
 
   // Sync with localStorage on change
   useEffect(() => {
@@ -55,66 +68,81 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased selection:bg-red-500/30 selection:text-white">
-      {/* Navigation & Control Header */}
-      <Navbar
-        config={config}
-        activeView={activeView}
-        setActiveView={setActiveView}
-        onOpenImporter={() => setIsImporterOpen(true)}
-        onResetToDefault={handleResetToDefault}
-      />
+    <ErrorBoundary>
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased selection:bg-red-500/30 selection:text-white">
+        {/* Navigation & Control Header */}
+        <Navbar
+          config={config}
+          activeView={activeView}
+          setActiveView={setActiveView}
+          onOpenImporter={() => setIsImporterOpen(true)}
+          onResetToDefault={handleResetToDefault}
+          onOpenHostingGuide={() => setIsHostingGuideOpen(true)}
+        />
 
-      {/* Main View Area */}
-      <main className="flex-1">
-        {activeView === 'victim' && (
-          <VictimView
-            config={config}
-            onNavigateToDashboard={() => setActiveView('dashboard')}
-          />
-        )}
+        {/* Main View Area */}
+        <main className="flex-1">
+          {/* WEBSITE 1: CITIZEN SOS PORTAL */}
+          {activeView === 'victim' && (
+            <CitizenPortal
+              config={config}
+              onNavigateToAdmin={() => setActiveView('dashboard')}
+              onOpenHostingGuide={() => setIsHostingGuideOpen(true)}
+            />
+          )}
 
-        {activeView === 'dashboard' && (
-          <DashboardView
-            config={config}
-            onOpenImporter={() => setIsImporterOpen(true)}
-            onNavigateToWebsite={() => setActiveView('victim')}
-          />
-        )}
+          {/* WEBSITE 2: EMERGENCY OPERATIONS CENTER (EOC) ADMIN COMMAND */}
+          {activeView === 'dashboard' && (
+            <AdminPortal
+              config={config}
+              onNavigateToCitizen={() => setActiveView('victim')}
+              onOpenHostingGuide={() => setIsHostingGuideOpen(true)}
+            />
+          )}
 
-        {activeView === 'split' && (
-          <SplitView
-            config={config}
-            onOpenImporter={() => setIsImporterOpen(true)}
-            onNavigateToWebsite={() => setActiveView('victim')}
-            onNavigateToDashboard={() => setActiveView('dashboard')}
-          />
-        )}
+          {/* DUAL OPERATIONS LIVE BRIDGE: BOTH CONNECTED */}
+          {activeView === 'split' && (
+            <DualSplitView
+              config={config}
+              onSelectCitizen={() => setActiveView('victim')}
+              onSelectAdmin={() => setActiveView('dashboard')}
+              onOpenHostingGuide={() => setIsHostingGuideOpen(true)}
+            />
+          )}
 
-        {activeView === 'mesh' && (
-          <MeshNetworkView
-            config={config}
-            onNavigateToDashboard={() => setActiveView('dashboard')}
-            onNavigateToVictim={() => setActiveView('victim')}
-          />
-        )}
+          {/* P2P MESH DIAGNOSTICS */}
+          {activeView === 'mesh' && (
+            <MeshNetworkView
+              config={config}
+              onNavigateToDashboard={() => setActiveView('dashboard')}
+              onNavigateToVictim={() => setActiveView('victim')}
+            />
+          )}
 
-        {activeView === 'overview' && (
-          <WebsiteView
-            config={config}
-            onNavigateToDashboard={() => setActiveView('dashboard')}
-            onOpenImporter={() => setIsImporterOpen(true)}
-          />
-        )}
-      </main>
+          {/* PROJECT ARCHITECTURE & REPO SYNC */}
+          {activeView === 'overview' && (
+            <WebsiteView
+              config={config}
+              onNavigateToDashboard={() => setActiveView('dashboard')}
+              onOpenImporter={() => setIsImporterOpen(true)}
+            />
+          )}
+        </main>
 
-      {/* GitHub Importer & Reader Modal */}
-      <GitHubImporterModal
-        isOpen={isImporterOpen}
-        onClose={() => setIsImporterOpen(false)}
-        onUpdateConfig={handleUpdateConfig}
-        currentConfig={config}
-      />
-    </div>
+        {/* Free Web Hosting & Cloudflare Guide Modal */}
+        <HostingGuideModal
+          isOpen={isHostingGuideOpen}
+          onClose={() => setIsHostingGuideOpen(false)}
+        />
+
+        {/* GitHub Importer & Reader Modal */}
+        <GitHubImporterModal
+          isOpen={isImporterOpen}
+          onClose={() => setIsImporterOpen(false)}
+          onUpdateConfig={handleUpdateConfig}
+          currentConfig={config}
+        />
+      </div>
+    </ErrorBoundary>
   );
 }

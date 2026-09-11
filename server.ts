@@ -101,6 +101,87 @@ async function startServer() {
 
   let sosSignals: SosRecord[] = [...initialSosSignals].sort((a, b) => b.priority - a.priority);
 
+  // Server-Sent Events (SSE) for Real-Time Multi-Portal Synchronization
+  const sseClients = new Set<express.Response>();
+
+  function broadcastRealtimeEvent(event: string, payload: any) {
+    const dataString = `data: ${JSON.stringify({ event, payload, timestamp: new Date().toISOString() })}\n\n`;
+    for (const client of sseClients) {
+      try {
+        client.write(dataString);
+      } catch {
+        sseClients.delete(client);
+      }
+    }
+  }
+
+  // Real-time SSE Stream Endpoint
+  app.get('/api/events', (req, res) => {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    });
+    res.write(`data: ${JSON.stringify({ event: 'connected', payload: { clientCount: sseClients.size + 1 } })}\n\n`);
+    sseClients.add(res);
+
+    const heartbeat = setInterval(() => {
+      try {
+        res.write(': keepalive\n\n');
+      } catch {
+        clearInterval(heartbeat);
+        sseClients.delete(res);
+      }
+    }, 20000);
+
+    req.on('close', () => {
+      clearInterval(heartbeat);
+      sseClients.delete(res);
+    });
+  });
+
+  // Emergency Advisories Store
+  interface Advisory {
+    id: string;
+    title: string;
+    message: string;
+    level: 'CRITICAL' | 'WARNING' | 'INFO';
+    issuedAt: string;
+    issuedBy: string;
+  }
+
+  let emergencyAdvisories: Advisory[] = [
+    {
+      id: 'adv-1',
+      title: 'Flash Flood Warning - Sector 4 Lowlands',
+      message: 'Storm surge exceeding 2.2m. All residents in Sector 4 river basin must evacuate to North Ridge high ground immediately.',
+      level: 'CRITICAL',
+      issuedAt: '11:15 AM',
+      issuedBy: 'Incident Commander',
+    },
+  ];
+
+  app.get('/api/advisories', (req, res) => {
+    res.json(emergencyAdvisories);
+  });
+
+  app.post('/api/advisories', (req, res) => {
+    const { title, message, level } = req.body;
+    const newAdvisory: Advisory = {
+      id: 'adv-' + Date.now(),
+      title: String(title || 'Emergency Advisory').trim(),
+      message: String(message || '').trim(),
+      level: level === 'CRITICAL' || level === 'WARNING' ? level : 'INFO',
+      issuedAt: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      issuedBy: 'Emergency Operations Center',
+    };
+    emergencyAdvisories.unshift(newAdvisory);
+    if (emergencyAdvisories.length > 10) emergencyAdvisories = emergencyAdvisories.slice(0, 10);
+    broadcastRealtimeEvent('new-advisory', newAdvisory);
+    res.status(201).json({ status: 'success', data: newAdvisory });
+  });
+
   // RescuNet API: GET all SOS distress signals
   app.get('/api/sos', (req, res) => {
     res.json(sosSignals);
@@ -133,6 +214,9 @@ async function startServer() {
       sosSignals.push(newBeacon);
       sosSignals.sort((a, b) => b.priority - a.priority);
 
+      // Broadcast live to all connected admin and user portals
+      broadcastRealtimeEvent('new-sos', newBeacon);
+
       res.status(201).json({ status: 'success', data: newBeacon });
     } catch (err: any) {
       console.error('Error handling SOS:', err);
@@ -154,6 +238,10 @@ async function startServer() {
     if (notes !== undefined) {
       signal.notes = String(notes);
     }
+
+    // Broadcast status change in real time to both portals
+    broadcastRealtimeEvent('status-change', signal);
+
     res.json({ status: 'success', data: signal });
   });
 
@@ -161,12 +249,14 @@ async function startServer() {
   app.delete('/api/sos/:id', (req, res) => {
     const id = parseInt(req.params.id, 10);
     sosSignals = sosSignals.filter((s) => s.id !== id);
+    broadcastRealtimeEvent('delete-sos', { id });
     res.json({ status: 'success', message: 'Signal removed' });
   });
 
   // Reset SOS signals to default state
   app.post('/api/sos/reset', (req, res) => {
     sosSignals = [...initialSosSignals].sort((a, b) => b.priority - a.priority);
+    broadcastRealtimeEvent('reset-signals', sosSignals);
     res.json({ status: 'success', signals: sosSignals });
   });
 
