@@ -198,7 +198,7 @@ async function startServer() {
       const priority = calculatePriority(condition, battery);
 
       const newBeacon: SosRecord = {
-        id: sosSignals.length > 0 ? Math.max(...sosSignals.map((s) => s.id)) + 1 : 1,
+        id: data.id ? Number(data.id) : (sosSignals.length > 0 ? Math.max(...sosSignals.map((s) => s.id)) + 1 : 1),
         name: data.name ? String(data.name).trim() : 'Anonymous Victim',
         condition,
         battery,

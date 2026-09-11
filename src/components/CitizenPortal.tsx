@@ -19,7 +19,13 @@ import {
   SunMedium
 } from 'lucide-react';
 import { AppConfig, SosSignal } from '../types';
-import { realtime, submitSosSignal, getEmergencyAdvisories, EmergencyAdvisory } from '../services/realtime';
+import { 
+  realtime, 
+  submitSosSignal, 
+  patchSosStatus,
+  getEmergencyAdvisories, 
+  EmergencyAdvisory 
+} from '../services/realtime';
 
 interface CitizenPortalProps {
   config: AppConfig;
@@ -268,25 +274,8 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
       try {
         localStorage.setItem('rescunet_active_sos_signal', JSON.stringify(savedSignal));
       } catch {}
-    } catch {
-      // Offline fallback: create local mesh beacon
-      const simulatedSignal: SosSignal = {
-        id: Date.now(),
-        name: payload.name || 'Survivor in Distress',
-        condition: selectedCondition,
-        battery: 85,
-        lat: safeLat,
-        lng: safeLng,
-        priority: 88.0,
-        time: payload.time || 'Now',
-        status: 'active',
-        notes: payload.notes,
-        meshHops: 2,
-      };
-      setActiveSignal(simulatedSignal);
-      try {
-        localStorage.setItem('rescunet_active_sos_signal', JSON.stringify(simulatedSignal));
-      } catch {}
+    } catch (err) {
+      console.warn('Transmission fallback:', err);
     } finally {
       setIsTransmitting(false);
     }
@@ -295,6 +284,9 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
   // Clear / Cancel SOS
   const handleCancelSOS = () => {
     if (window.confirm('Are you certain you are safe and want to cancel this distress beacon?')) {
+      if (activeSignal && activeSignal.id) {
+        patchSosStatus(activeSignal.id, 'rescued', 'Beacon marked safe / cancelled by survivor.');
+      }
       setActiveSignal(null);
       try {
         localStorage.removeItem('rescunet_active_sos_signal');

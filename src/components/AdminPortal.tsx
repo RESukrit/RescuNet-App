@@ -23,7 +23,15 @@ import {
 } from 'lucide-react';
 import { AppConfig, SosSignal, HazardZone } from '../types';
 import { LeafletMap } from './LeafletMap';
-import { realtime, getSosSignals, patchSosStatus, publishEmergencyAdvisory, EmergencyAdvisory } from '../services/realtime';
+import { 
+  realtime, 
+  getSosSignals, 
+  getLocalSignals,
+  resetLocalSignals,
+  patchSosStatus, 
+  publishEmergencyAdvisory, 
+  EmergencyAdvisory 
+} from '../services/realtime';
 
 interface AdminPortalProps {
   config: AppConfig;
@@ -36,8 +44,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   onNavigateToCitizen,
   onOpenHostingGuide,
 }) => {
-  const [signals, setSignals] = useState<SosSignal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [signals, setSignals] = useState<SosSignal[]>(() => getLocalSignals());
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedSignalId, setSelectedSignalId] = useState<number | null>(null);
   const [filterSeverity, setFilterSeverity] = useState<'all' | 'critical' | 'active' | 'assigned' | 'rescued'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -169,12 +177,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   // Handle Reset data
   const handleResetData = async () => {
+    const reset = resetLocalSignals();
+    setSignals(reset);
     try {
-      const res = await fetch('/api/sos/reset', { method: 'POST' });
-      if (res.ok) {
-        const d = await res.json();
-        setSignals(d.signals || []);
-      }
+      await fetch('/api/sos/reset', { method: 'POST' });
     } catch {}
   };
 

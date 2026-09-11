@@ -25,6 +25,7 @@ import {
   Share2
 } from 'lucide-react';
 import { AppConfig, SosSignal } from '../types';
+import { submitSosSignal } from '../services/realtime';
 
 interface VictimViewProps {
   config: AppConfig;
@@ -182,18 +183,7 @@ export const VictimView: React.FC<VictimViewProps> = ({
     };
 
     try {
-      const response = await fetch('/api/sos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server returned ${response.status}`);
-      }
-
-      const resData = await response.json();
-      const savedSignal = resData.data;
+      const savedSignal = await submitSosSignal(payload);
 
       setBroadcastResult({
         success: true,
@@ -207,7 +197,7 @@ export const VictimView: React.FC<VictimViewProps> = ({
       }
     } catch (err) {
       // Offline fallback: simulate local mesh broadcast
-      const simulatedPriority = calculateSimulatedPriority(condition, battery);
+      const simulatedPriority = calculateSimulatedPriority(condition, safeBattery);
       setBroadcastResult({
         success: true,
         priority: simulatedPriority,
