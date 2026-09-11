@@ -1,0 +1,6 @@
+{
+  "name": "GitHub Page Dashboard",
+  "description": "RescuNet disaster management, offline peer-to-peer mesh SOS portal, and command triage dashboard.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
