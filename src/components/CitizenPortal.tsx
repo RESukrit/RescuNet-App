@@ -16,7 +16,9 @@ import {
   Waves,
   HeartPulse,
   HelpCircle,
-  SunMedium
+  SunMedium,
+  PhoneCall,
+  Lock
 } from 'lucide-react';
 import { AppConfig, SosSignal } from '../types';
 import { 
@@ -364,21 +366,14 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={onOpenHostingGuide}
-              className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40"
+            <a
+              href="tel:911"
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-red-600/30 flex items-center gap-1.5"
+              title="Quick Dial Emergency Hotline 911"
             >
-              <Globe className="w-3.5 h-3.5" />
-              <span>Deploy Free</span>
-            </button>
-
-            <button
-              onClick={onNavigateToAdmin}
-              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all shadow-md shadow-blue-600/30 flex items-center gap-1"
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>EOC Command →</span>
-            </button>
+              <PhoneCall className="w-3.5 h-3.5 animate-bounce" />
+              <span>Call 911</span>
+            </a>
           </div>
 
         </div>
@@ -686,6 +681,18 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               )}
             </div>
           )}
+        </div>
+
+        {/* Discreet First Responder Authentication */}
+        <div className="text-center pt-6 pb-8">
+          <button
+            onClick={onNavigateToAdmin}
+            className="text-slate-600 hover:text-slate-400 text-[11px] inline-flex items-center gap-1.5 transition-colors py-1.5 px-3 rounded-lg border border-slate-800/80 hover:border-slate-700 bg-slate-900/40"
+            title="Restricted First Responder Terminal Access"
+          >
+            <Lock className="w-3 h-3 text-slate-500" />
+            <span>Authorized Responder Terminal Access</span>
+          </button>
         </div>
 
       </main>

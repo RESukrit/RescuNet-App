@@ -19,7 +19,8 @@ import {
   Bell,
   Activity,
   Users,
-  Eye
+  Eye,
+  Lock
 } from 'lucide-react';
 import { AppConfig, SosSignal, HazardZone } from '../types';
 import { LeafletMap } from './LeafletMap';
@@ -285,10 +286,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
             <button
               onClick={onNavigateToCitizen}
-              className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-red-600/30 flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/40 rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5"
+              title="Lock responder terminal and switch back to citizen view"
             >
-              <Radio className="w-3.5 h-3.5" />
-              <span>Open Citizen Portal →</span>
+              <Lock className="w-3.5 h-3.5" />
+              <span>Lock &amp; Exit to Citizen Site</span>
             </button>
           </div>
 

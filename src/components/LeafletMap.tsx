@@ -37,17 +37,17 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       zoomControl: true,
     });
 
- // Dark-themed tiles for emergency command center look
-    const cartoKey = import.meta.env.VITE_CARTO_API_KEY;
+    // Dark-themed tiles for emergency command center look
+    const cartoKey = (import.meta as any).env?.VITE_CARTO_API_KEY;
     const tileUrl = cartoKey
       ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${cartoKey}`
-      : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  className: 'dark-tiles',
-  maxZoom: 19,
-   }).addTo(map);
+    L.tileLayer(tileUrl, {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      className: cartoKey ? '' : 'dark-tiles',
+      maxZoom: 19,
+    }).addTo(map);
 
     const markersGroup = L.layerGroup().addTo(map);
     const hazardsGroup = L.layerGroup().addTo(map);
