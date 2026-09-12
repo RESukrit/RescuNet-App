@@ -11,7 +11,11 @@ import {
   Terminal, 
   X,
   Radio,
-  Share2
+  Share2,
+  AlertCircle,
+  HelpCircle,
+  Lock,
+  MapPin
 } from 'lucide-react';
 
 interface HostingGuideModalProps {
@@ -42,13 +46,13 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
             </div>
             <div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <span>Deploying Both Websites Live to the Real Web (Free Tier)</span>
+                <span>Deploying to Cloudflare Pages &amp; Live Web (Free Tier)</span>
                 <span className="text-[10px] uppercase font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30">
                   100% Free
                 </span>
               </h2>
               <p className="text-xs text-slate-400">
-                Deploy the Citizen SOS Portal and Admin Command Center with zero downtime &amp; zero errors.
+                Deploy both the Citizen SOS Portal and Admin EOC with OpenStreetMap integration.
               </p>
             </div>
           </div>
@@ -71,7 +75,7 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
             }`}
           >
             <Cloud className="w-4 h-4" />
-            <span>Cloudflare Pages &amp; Workers</span>
+            <span>Cloudflare Pages Setup &amp; Fixes</span>
           </button>
 
           <button
@@ -95,7 +99,7 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
             }`}
           >
             <Zap className="w-4 h-4" />
-            <span>Vercel / Render (1-Click)</span>
+            <span>Vercel / Netlify Deploy</span>
           </button>
 
           <button
@@ -117,66 +121,92 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
           {/* TAB 1: CLOUDFLARE */}
           {activeTab === 'cloudflare' && (
             <div className="space-y-6">
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-amber-200 text-xs">
-                <strong>Why Cloudflare?</strong> Cloudflare gives you free unlimited bandwidth, automated global DDoS mitigation, free SSL, and lets you host custom domains (e.g. <code className="text-white bg-slate-950 px-1 py-0.5 rounded">sos.rescunet.org</code> for survivors and <code className="text-white bg-slate-950 px-1 py-0.5 rounded">eoc.rescunet.org</code> for emergency services).
+              
+              {/* Not seeing it on Cloudflare? Checklist */}
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-amber-200 text-xs space-y-2">
+                <div className="font-bold text-sm text-amber-300 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Why might you not be seeing it on Cloudflare Pages?</span>
+                </div>
+                <ul className="list-disc list-inside space-y-1 text-slate-300">
+                  <li><strong>Build output directory:</strong> Ensure Cloudflare Pages output directory is set to <code className="bg-slate-950 text-amber-300 px-1 py-0.5 rounded font-mono">dist</code> (not build or public).</li>
+                  <li><strong>Node.js Version:</strong> Cloudflare Pages defaults to Node 12 or 16 on older projects. We've included <code className="bg-slate-950 text-amber-300 px-1 py-0.5 rounded font-mono">.nvmrc</code> (Node 20). You can also add environment variable <code className="bg-slate-950 text-amber-300 px-1 py-0.5 rounded font-mono">NODE_VERSION = 20</code> in your Cloudflare dashboard.</li>
+                  <li><strong>Public Citizen View vs. EOC Responder View:</strong> By default, visitors to your <code className="bg-slate-950 text-amber-300 px-1 py-0.5 rounded font-mono">.pages.dev</code> domain see the Citizen SOS screen. To view the Emergency Operations Center (EOC), add <code className="bg-slate-950 text-amber-300 px-1 py-0.5 rounded font-mono">?portal=admin</code> or click "Authorized Responder Terminal Access" with PIN <strong>9110</strong>!</li>
+                </ul>
               </div>
 
+              {/* Deployment Option 1: Git Connect */}
               <div className="space-y-4">
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center">1</span>
-                  <span>Connect Your GitHub Repository to Cloudflare Pages</span>
+                  <span>Option A: Connect GitHub Repository to Cloudflare Pages (Recommended)</span>
                 </h3>
                 <p className="text-xs text-slate-300">
-                  Log in to <a href="https://dash.cloudflare.com" target="_blank" rel="noreferrer" className="text-amber-400 underline">dash.cloudflare.com</a>, navigate to <strong>Workers &amp; Pages</strong>, and click <strong>Create Application &gt; Pages &gt; Connect to Git</strong>.
+                  In <a href="https://dash.cloudflare.com" target="_blank" rel="noreferrer" className="text-amber-400 underline font-semibold">dash.cloudflare.com</a> &gt; <strong>Workers &amp; Pages</strong> &gt; <strong>Create Application &gt; Pages &gt; Connect to Git</strong>:
                 </p>
                 <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs space-y-2 text-slate-300">
                   <div className="flex items-center justify-between text-slate-400 text-[11px] pb-1 border-b border-slate-800">
-                    <span>Cloudflare Build Settings:</span>
+                    <span>Cloudflare Pages Build Settings:</span>
                   </div>
+                  <div><strong>Framework preset:</strong> <code className="text-emerald-400">Vite</code> (or None)</div>
                   <div><strong>Build command:</strong> <code className="text-emerald-400">npm run build</code></div>
                   <div><strong>Build output directory:</strong> <code className="text-emerald-400">dist</code></div>
-                  <div><strong>Node.js Version:</strong> <code className="text-emerald-400">20</code> (or 22)</div>
+                  <div><strong>Root directory:</strong> <code className="text-slate-400">(leave blank)</code></div>
+                  <div className="pt-2 border-t border-slate-900 text-slate-400">
+                    <span>Environment Variables (Settings &gt; Environment variables):</span>
+                    <div className="mt-1 text-emerald-400">NODE_VERSION = 20</div>
+                  </div>
                 </div>
               </div>
 
+              {/* Deployment Option 2: Wrangler CLI */}
               <div className="space-y-4">
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center">2</span>
-                  <span>Direct URL Routing for Both Portals</span>
+                  <span>Option B: Direct 1-Line Deploy with Wrangler CLI</span>
                 </h3>
                 <p className="text-xs text-slate-300">
-                  Both portals are built into this single high-speed codebase with dedicated URLs:
+                  If you have Wrangler CLI installed on your machine, deploy in 10 seconds:
                 </p>
+                <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-emerald-400 flex items-center justify-between">
+                  <code>npx wrangler pages deploy dist --project-name=rescunet</code>
+                  <button
+                    onClick={() => copyToClipboard('npx wrangler pages deploy dist --project-name=rescunet', 'wrangler-cmd')}
+                    className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-sans transition-colors flex items-center gap-1"
+                  >
+                    {copiedCode === 'wrangler-cmd' ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    <span>Copy</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Portal URLs on Cloudflare */}
+              <div className="space-y-4">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center">3</span>
+                  <span>How to View Both Portals on Your Cloudflare Domain</span>
+                </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="bg-slate-950 border border-red-900/50 rounded-xl p-3.5 space-y-1.5">
                     <div className="font-bold text-red-400 text-xs flex items-center gap-1.5">
                       <Radio className="w-3.5 h-3.5" />
-                      <span>Citizen / Survivor Portal</span>
+                      <span>Citizen SOS Portal (Public)</span>
                     </div>
-                    <p className="text-[11px] text-slate-400">Add <code className="text-white bg-slate-900 px-1 rounded">?portal=citizen</code> or click "Citizen SOS" tab.</p>
-                    <div className="text-[10px] text-slate-500 font-mono">https://yourdomain.com/?portal=citizen</div>
+                    <p className="text-[11px] text-slate-400">The default homepage for all citizens in distress.</p>
+                    <div className="text-[10px] text-slate-400 font-mono bg-slate-900 p-1.5 rounded">https://your-app.pages.dev/</div>
                   </div>
 
                   <div className="bg-slate-950 border border-blue-900/50 rounded-xl p-3.5 space-y-1.5">
                     <div className="font-bold text-blue-400 text-xs flex items-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Emergency Operations (EOC) Admin</span>
+                      <span>Emergency Operations (EOC) Command</span>
                     </div>
-                    <p className="text-[11px] text-slate-400">Add <code className="text-white bg-slate-900 px-1 rounded">?portal=admin</code> or click "EOC Command" tab.</p>
-                    <div className="text-[10px] text-slate-500 font-mono">https://yourdomain.com/?portal=admin</div>
+                    <p className="text-[11px] text-slate-400">Protected tactical terminal (Default PIN: <strong>9110</strong>).</p>
+                    <div className="text-[10px] text-slate-400 font-mono bg-slate-900 p-1.5 rounded">https://your-app.pages.dev/?portal=admin</div>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-amber-500 text-slate-950 font-black text-xs flex items-center justify-center">3</span>
-                  <span>Optional Custom Subdomain Mapping (Cloudflare DNS)</span>
-                </h3>
-                <p className="text-xs text-slate-300">
-                  You can set up free subdomains in Cloudflare DNS pointing to the same deployment, with a 2-line Cloudflare Transform Rule to rewrite to <code className="text-white bg-slate-950 px-1 rounded">?portal=citizen</code> or <code className="text-white bg-slate-950 px-1 rounded">?portal=admin</code> automatically.
-                </p>
-              </div>
             </div>
           )}
 
@@ -186,10 +216,10 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
               <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-4 text-blue-200 text-xs space-y-2">
                 <div className="font-bold text-sm text-blue-100 flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Your Application Is Already Running Live on Cloud Run Right Now!</span>
+                  <span>Your Application Is Already Running Live Right Now!</span>
                 </div>
                 <p>
-                  The current container build serves both websites live with full backend APIs and real-time Server-Sent Events on port 3000.
+                  The current container serves both portals live with genuine OpenStreetMap cartography on port 3000.
                 </p>
               </div>
 
@@ -199,7 +229,7 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
                   <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between text-xs">
                     <div className="font-mono text-slate-300 truncate">
                       <span className="text-slate-500">Citizen Portal: </span>
-                      {window.location.origin}/?portal=citizen
+                      {typeof window !== 'undefined' ? window.location.origin : ''}/?portal=citizen
                     </div>
                     <button
                       onClick={() => copyToClipboard(`${window.location.origin}/?portal=citizen`, 'citizen')}
@@ -213,7 +243,7 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
                   <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between text-xs">
                     <div className="font-mono text-slate-300 truncate">
                       <span className="text-slate-500">Admin EOC Portal: </span>
-                      {window.location.origin}/?portal=admin
+                      {typeof window !== 'undefined' ? window.location.origin : ''}/?portal=admin
                     </div>
                     <button
                       onClick={() => copyToClipboard(`${window.location.origin}/?portal=admin`, 'admin')}
@@ -224,16 +254,6 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
                     </button>
                   </div>
                 </div>
-              </div>
-
-              <div className="border-t border-slate-800 pt-4">
-                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">How to test live multi-device connectivity:</h4>
-                <ol className="list-decimal list-inside text-xs text-slate-400 space-y-1.5">
-                  <li>Open the Citizen Portal URL on your phone or in tab 1.</li>
-                  <li>Open the Admin EOC Portal URL on your desktop or in tab 2.</li>
-                  <li>Click <strong>SEND EMERGENCY SOS</strong> on the phone: watch it instantly pop up on the EOC map with audio ping!</li>
-                  <li>Click <strong>Dispatch Unit</strong> on the EOC: watch the phone instantly update with the assigned rescue team!</li>
-                </ol>
               </div>
             </div>
           )}
@@ -253,7 +273,6 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
               <div className="space-y-2 text-xs text-slate-400">
                 <p>• Framework Preset: <strong>Vite</strong></p>
                 <p>• Output Directory: <strong>dist</strong></p>
-                <p>• Serverless functions route <code className="text-white">/api/*</code> requests automatically.</p>
               </div>
             </div>
           )}
@@ -262,10 +281,18 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
           {activeTab === 'architecture' && (
             <div className="space-y-4">
               <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-4 text-emerald-200 text-xs">
-                <strong>Zero-Error Guarantee:</strong> Here is how we engineered the app to guarantee zero unhandled errors or blank screens:
+                <strong>Zero-Error Guarantee:</strong> Here is how the application is optimized for stability:
               </div>
 
               <div className="space-y-3 text-xs text-slate-300">
+                <div className="flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <strong className="text-white">Authentic OpenStreetMap Integration:</strong>
+                    <p className="text-slate-400">Directly uses standard OpenStreetMap tiles with Humanitarian (HOT) and Topo layers, without inverting filters or missing tile errors.</p>
+                  </div>
+                </div>
+
                 <div className="flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                   <div>
@@ -278,23 +305,7 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
                   <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                   <div>
                     <strong className="text-white">Dual Offline Fallbacks:</strong>
-                    <p className="text-slate-400">If the server network drops or cell service is cut, the app seamlessly switches to browser localStorage + Web Audio + BroadcastChannel without failing or showing red error banners.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <strong className="text-white">React Error Boundary Protection:</strong>
-                    <p className="text-slate-400">Any transient component error is safely trapped by an error boundary with instant recovery, preventing total app crashes.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <strong className="text-white">Live Cross-Tab &amp; SSE Resilience:</strong>
-                    <p className="text-slate-400">Real-time sync utilizes Server-Sent Events with automated reconnect backoff plus redundant cross-tab BroadcastChannel communication.</p>
+                    <p className="text-slate-400">If the server network drops, the app seamlessly switches to browser localStorage + Web Audio + BroadcastChannel without failing.</p>
                   </div>
                 </div>
               </div>
@@ -306,7 +317,7 @@ export const HostingGuideModal: React.FC<HostingGuideModalProps> = ({ isOpen, on
         {/* Modal Footer */}
         <div className="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs">
           <span className="text-slate-400">
-            RescuNet Emergency Response Platform v2.4 • Production Ready
+            RescuNet Emergency Response Platform v2.4 • OpenStreetMap &amp; Cloudflare Ready
           </span>
           <button
             onClick={onClose}
