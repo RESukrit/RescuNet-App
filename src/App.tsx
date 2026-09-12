@@ -31,11 +31,11 @@ export default function App() {
     return defaultAppConfig;
   });
 
-  // Responder authorization state
+  // Responder authorization state (session scoped so every fresh visit starts at the rescue page and requires password)
   const [isResponderAuth, setIsResponderAuth] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       try {
-        return localStorage.getItem('rescunet_eoc_authorized') === 'true';
+        return sessionStorage.getItem('rescunet_eoc_authorized') === 'true';
       } catch {
         return false;
       }
@@ -46,36 +46,8 @@ export default function App() {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [pendingResponderView, setPendingResponderView] = useState<ActiveViewType>('dashboard');
 
-  // Determine initial portal based on URL search query, path, or hash
-  const [activeView, setActiveView] = useState<ActiveViewType>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const portal = params.get('portal')?.toLowerCase();
-      const pathname = window.location.pathname.toLowerCase();
-      const hash = window.location.hash.toLowerCase();
-
-      const wantsAdmin =
-        portal === 'admin' ||
-        portal === 'eoc' ||
-        portal === 'command' ||
-        portal === 'responder' ||
-        pathname.includes('/admin') ||
-        pathname.includes('/eoc') ||
-        pathname.includes('/command') ||
-        hash === '#admin' ||
-        hash === '#eoc';
-
-      const isAuthed = localStorage.getItem('rescunet_eoc_authorized') === 'true';
-
-      if (wantsAdmin && isAuthed) {
-        return 'dashboard';
-      }
-
-      // Default for ALL public users and citizens: Citizen SOS Portal
-      return 'victim';
-    }
-    return 'victim';
-  });
+  // ALWAYS start at the Citizen Rescue SOS Page ('victim')
+  const [activeView, setActiveView] = useState<ActiveViewType>('victim');
 
   // Check on load if someone requested admin URL without being authorized yet
   useEffect(() => {
@@ -96,9 +68,14 @@ export default function App() {
         hash === '#admin' ||
         hash === '#eoc';
 
-      if (wantsAdmin && !isResponderAuth) {
-        setPendingResponderView('dashboard');
-        setShowAuthModal(true);
+      if (wantsAdmin) {
+        if (!isResponderAuth) {
+          setPendingResponderView('dashboard');
+          setShowAuthModal(true);
+          setActiveView('victim');
+        } else {
+          setActiveView('dashboard');
+        }
       }
     }
   }, [isResponderAuth]);
@@ -134,7 +111,7 @@ export default function App() {
   const handleAuthorizeResponder = () => {
     setIsResponderAuth(true);
     try {
-      localStorage.setItem('rescunet_eoc_authorized', 'true');
+      sessionStorage.setItem('rescunet_eoc_authorized', 'true');
     } catch {}
     setShowAuthModal(false);
     setActiveView(pendingResponderView);
@@ -150,6 +127,7 @@ export default function App() {
   const handleLockEoc = () => {
     setIsResponderAuth(false);
     try {
+      sessionStorage.removeItem('rescunet_eoc_authorized');
       localStorage.removeItem('rescunet_eoc_authorized');
     } catch {}
     setActiveView('victim');

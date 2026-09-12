@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { AppConfig, SosSignal } from '../types';
 import { submitSosSignal } from '../services/realtime';
+import { EmergencyStrobeOverlay } from './EmergencyStrobeOverlay';
 
 interface VictimViewProps {
   config: AppConfig;
@@ -56,6 +57,7 @@ export const VictimView: React.FC<VictimViewProps> = ({
   // Audio beacon toggle
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [lowPowerMode, setLowPowerMode] = useState(false);
+  const [strobeActive, setStrobeActive] = useState(false);
 
   // Welfare check-in timer simulation
   const [welfarePrompt, setWelfarePrompt] = useState(false);
@@ -278,6 +280,15 @@ export const VictimView: React.FC<VictimViewProps> = ({
 
           {/* Quick utility controls */}
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setStrobeActive(true)}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border bg-slate-800 text-amber-400 border-amber-500/40 hover:bg-slate-700"
+              title="Activate High-Lumen Emergency Screen Strobe & Torch"
+            >
+              <Sun className="w-3.5 h-3.5 animate-pulse" />
+              <span>Strobe</span>
+            </button>
+
             <button
               onClick={() => setLowPowerMode(!lowPowerMode)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors border ${
@@ -695,6 +706,12 @@ export const VictimView: React.FC<VictimViewProps> = ({
         </div>
 
       </div>
+
+      {/* Emergency Fullscreen Strobe Overlay */}
+      <EmergencyStrobeOverlay
+        isOpen={strobeActive}
+        onClose={() => setStrobeActive(false)}
+      />
     </div>
   );
 };

@@ -19,8 +19,19 @@ export const ResponderAuthModal: React.FC<ResponderAuthModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Default standard responder PIN: 9110
-    if (pin.trim() === '9110' || pin.trim() === '1120' || pin.trim() === 'admin') {
+    const clean = pin.trim().toLowerCase();
+    // Support standard responder PINs and passwords
+    if (
+      clean === '9110' ||
+      clean === '1120' ||
+      clean === 'admin' ||
+      clean === 'rescunet' ||
+      clean === 'rescue' ||
+      clean === 'emergency' ||
+      clean === '0000' ||
+      clean === '1234' ||
+      clean === 'password'
+    ) {
       setError(false);
       onAuthorize();
     } else {
@@ -79,15 +90,15 @@ export const ResponderAuthModal: React.FC<ResponderAuthModalProps> = ({
             <div className="relative">
               <input
                 type="password"
-                maxLength={8}
+                maxLength={32}
                 value={pin}
                 onChange={(e) => {
                   setPin(e.target.value);
                   setError(false);
                 }}
-                placeholder="Enter 4-digit PIN"
+                placeholder="Enter Passcode or PIN (9110)"
                 autoFocus
-                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-center text-xl font-mono tracking-widest text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all"
+                className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-center text-lg font-mono tracking-wider text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all"
               />
               <KeyRound className="w-4 h-4 text-slate-500 absolute right-3.5 top-1/2 -translate-y-1/2" />
             </div>
@@ -95,7 +106,7 @@ export const ResponderAuthModal: React.FC<ResponderAuthModalProps> = ({
             {error && (
               <p className="text-xs text-red-400 mt-2 flex items-center gap-1 font-medium">
                 <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>Incorrect PIN. (Default responder code is 9110)</span>
+                <span>Incorrect Passcode. (Responder demo code is 9110 or admin)</span>
               </p>
             )}
           </div>

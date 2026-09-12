@@ -18,7 +18,8 @@ import {
   HelpCircle,
   SunMedium,
   PhoneCall,
-  Lock
+  Lock,
+  Flashlight
 } from 'lucide-react';
 import { AppConfig, SosSignal } from '../types';
 import { 
@@ -28,6 +29,7 @@ import {
   getEmergencyAdvisories, 
   EmergencyAdvisory 
 } from '../services/realtime';
+import { EmergencyStrobeOverlay } from './EmergencyStrobeOverlay';
 
 interface CitizenPortalProps {
   config: AppConfig;
@@ -238,23 +240,7 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
     };
   }, []);
 
-  // 4. Strobe screen effect for night/debris signaling
-  useEffect(() => {
-    let strobeTimer: any;
-    if (strobeActive) {
-      strobeTimer = setInterval(() => {
-        document.body.classList.toggle('bg-white');
-      }, 300);
-    } else {
-      document.body.classList.remove('bg-white');
-    }
-    return () => {
-      clearInterval(strobeTimer);
-      document.body.classList.remove('bg-white');
-    };
-  }, [strobeActive]);
-
-  // 5. Submit Emergency SOS Beacon (1-Tap)
+  // 4. Submit Emergency SOS Beacon (1-Tap)
   const handleTransmitSOS = async () => {
     setIsTransmitting(true);
 
@@ -374,6 +360,16 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               <PhoneCall className="w-3.5 h-3.5 animate-bounce" />
               <span>Call 911</span>
             </a>
+
+            <button
+              onClick={onNavigateToAdmin}
+              className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg text-xs font-bold border border-slate-700 transition-all flex items-center gap-1.5 shadow-sm"
+              title="First Responder & Incident Commander Terminal (Password Protected)"
+            >
+              <Lock className="w-3.5 h-3.5 text-blue-400" />
+              <span className="hidden sm:inline">Responder EOC</span>
+              <span className="sm:hidden">EOC</span>
+            </button>
           </div>
 
         </div>
@@ -594,6 +590,37 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
               />
             </div>
 
+            {/* QUICK DISTRESS TOOLS BAR (NIGHT / DEBRIS / SMOKE SIGNALING) */}
+            <div className="grid grid-cols-2 gap-2.5 pt-1">
+              <button
+                type="button"
+                onClick={() => setStrobeActive(true)}
+                className="py-3 px-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-98"
+                title="Activate Fullscreen High-Lumen Optical Strobe & Camera Torch"
+              >
+                <SunMedium className="w-4 h-4 text-amber-400 animate-pulse" />
+                <span>Screen Strobe &amp; Torch</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={toggleAudioWhistle}
+                className={`py-3 px-3.5 rounded-2xl border text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-98 ${
+                  audioWhistleActive
+                    ? 'bg-amber-500 text-slate-950 border-amber-400 font-black ring-2 ring-amber-400'
+                    : 'bg-slate-900 hover:bg-slate-800 border-slate-700/80 text-white'
+                }`}
+                title="Sound Acoustic Search Dog Distress Whistle"
+              >
+                {audioWhistleActive ? (
+                  <VolumeX className="w-4 h-4 animate-bounce" />
+                ) : (
+                  <Volume2 className="w-4 h-4 text-blue-400" />
+                )}
+                <span>{audioWhistleActive ? 'Stop Whistle' : 'Rescue Whistle'}</span>
+              </button>
+            </div>
+
             {/* THE GIANT RED SOS TRANSMIT BUTTON */}
             <div className="pt-2">
               <button
@@ -683,19 +710,25 @@ export const CitizenPortal: React.FC<CitizenPortalProps> = ({
           )}
         </div>
 
-        {/* Discreet First Responder Authentication */}
+        {/* Responder Authentication Link */}
         <div className="text-center pt-6 pb-8">
           <button
             onClick={onNavigateToAdmin}
-            className="text-slate-600 hover:text-slate-400 text-[11px] inline-flex items-center gap-1.5 transition-colors py-1.5 px-3 rounded-lg border border-slate-800/80 hover:border-slate-700 bg-slate-900/40"
-            title="Restricted First Responder Terminal Access"
+            className="text-slate-500 hover:text-slate-300 text-xs inline-flex items-center gap-1.5 transition-colors py-2 px-3.5 rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900/60"
+            title="Authorized Emergency Operations Terminal Access"
           >
-            <Lock className="w-3 h-3 text-slate-500" />
-            <span>Authorized Responder Terminal Access</span>
+            <Lock className="w-3.5 h-3.5 text-blue-400" />
+            <span>Emergency Services &amp; First Responders: Access EOC (Passcode Required)</span>
           </button>
         </div>
 
       </main>
+
+      {/* FULLSCREEN OPTICAL EMERGENCY STROBE & HARDWARE TORCH OVERLAY */}
+      <EmergencyStrobeOverlay
+        isOpen={strobeActive}
+        onClose={() => setStrobeActive(false)}
+      />
 
     </div>
   );
